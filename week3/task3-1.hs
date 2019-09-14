@@ -4,12 +4,21 @@ import Data.Maybe
 charVals :: [(Char,Int)]
 charVals = filter (odd . snd) $ zip ['a'..'z'] [1..]
 
-c :: String
-c = map fst charVals
+chars :: String
+chars = map fst charVals
 
-v :: [Int]
-v = map snd charVals
+values :: [Int]
+values = map snd charVals
 
+f n (x:xs) = if find (==product') xs /= Nothing then product' : f n xs else []
+    where product' = n * x
+
+g [] = []
+g l@(x:xs) = if x == 1
+             then g xs
+             else (f x l) : g xs
+
+h = [fst c | c <- charVals, find (==(snd c)) (concat $ g values) /= Nothing]
 
 
 -- [
