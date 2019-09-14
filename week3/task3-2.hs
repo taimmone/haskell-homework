@@ -1,3 +1,7 @@
+-- module StringLen
+-- ( f
+-- , g
+-- ) where
 import Data.List
 
 f :: String -> String -> Float
