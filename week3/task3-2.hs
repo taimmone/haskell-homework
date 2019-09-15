@@ -1,9 +1,6 @@
-module StringLen
-( f
-, g
-) where
 import Data.List
 
+-- a)
 f :: String -> String -> Float
 f [] [] = 0
 f xs ys = 
@@ -12,6 +9,7 @@ f xs ys =
         lengthSum    = fromIntegral $ length xs + length ys
     in  (xCharsNotInY + yCharsNotInX) / lengthSum
 
+-- b)
 g :: String -> String -> Float
 g [] [] = 0
 g xs ys =
