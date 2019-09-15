@@ -1,8 +1,6 @@
 import Data.List
 import Data.Maybe
 
-oddChars :: [(Char,Int)]
-oddChars = filter (odd . snd) $ zip ['a'..'z'] [1..]
 
 chars :: String -- call this for the first part
 chars = map fst oddChars
@@ -10,8 +8,11 @@ chars = map fst oddChars
 values :: [Int]
 values = map snd oddChars
 
+oddChars :: [(Char,Int)]
+oddChars = filter (odd . snd) $ zip ['a'..'z'] [1..]
+
 -- Second part, a bit of a mess
-h = [fst c | c <- oddChars, find (==(snd c)) (concat $ g values) /= Nothing] -- "iouy"
+charProduct = [fst c | c <- oddChars, find (==(snd c)) (concat $ g values) /= Nothing] -- "iouy"
 
 f n (x:xs) = if find (==product') xs /= Nothing then product' : f n xs else []
     where product' = n * x
