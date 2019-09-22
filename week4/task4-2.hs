@@ -7,9 +7,9 @@ data CountryCode = CountryCode Integer
 data PhoneNo = PhoneNo Integer
     deriving Eq
 
-data Phone = Phone { phoneType :: PhoneType
+data Phone = Phone { phoneType   :: PhoneType
                    , countryCode :: CountryCode
-                   , phoneNo :: PhoneNo
+                   , phoneNo     :: PhoneNo
                    } deriving Eq
 
 -- Show instances for the data types
@@ -33,6 +33,6 @@ toPhoneNo pn
     | pn >= 0 = PhoneNo pn
     | otherwise = error "Phone number must be a positive integer."
 
--- Function to create a Phone type
+-- Function to create a Phone
 toPhone :: PhoneType -> CountryCode -> PhoneNo -> Phone
 toPhone pt cc pn = Phone { phoneType=pt, countryCode=cc, phoneNo=pn }
