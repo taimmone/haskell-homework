@@ -6,17 +6,6 @@ import Datadefs
 listOfSomeCountryCodes = ["1", "242", "236", "243", "420", "358", "996", "598", "666"]
 -------------------------------------------------------------------------------
 
-instance Show CountryCode where
-    show (CountryCode cc) = '+' : show cc
-
-instance Show PhoneNo where
-    show (PhoneNo pn) = show pn
-
-instance Show Phone where
-    show (Phone pt cc pn) = maybe "" (foldr (:) " " . show) cc
-                            ++ show pn
-                            ++ maybe "" ((++) " (" . foldr (:) ")" . show) pt
-
 toCountryCode :: Integer -> Maybe CountryCode
 toCountryCode cc
         | cc >= 0 = Just $ CountryCode cc
