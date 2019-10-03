@@ -1,24 +1,22 @@
--- Task 4.4
--- Find phonebook entries with a person's name
-findPhonebookEntry :: String -> [PhonebookEntry] -> [PhonebookEntry]
-findPhonebookEntry personName entries = filter (\entry -> name entry == personName) entries
+import qualified Data.Map as Map
 
--- Create a new phonebook entry (must be stored in a new variable)
-addPhonebookEntry :: String -> String -> String -> String -> [PhonebookEntry] -> [PhonebookEntry]
-addPhonebookEntry personName pt cc pn entries
-    | entry `elem` entries = entries
-    | otherwise = entries ++ [entry]
-    where entry = PhonebookEntry { name = personName, phone = readPhone pt cc pn }
+-- adds new phonebook entry or if an entry already exists, append the phone
+addPhonebookEntry :: String -> String -> String -> String -> Map.Map String [Phone] -> Map.Map String [Phone]
+addPhonebookEntry personName pt cc pn phonebook = 
+    Map.insertWith (++) personName [(readPhone pt cc pn)] phonebook
 
+-- finds a person from a phonebook and returns a map containing the person and all the phones,
+-- otherwise returns an empty map. 
+findPhonebookEntry :: String -> Map.Map String [Phone] -> Map.Map String (Maybe [Phone])
+findPhonebookEntry name phonebook = if Map.member name phonebookEntries 
+                then Map.insert name (Map.lookup name phonebookEntries) Map.empty else Map.empty
 
--- Premade phonebook with entries to test the findPhonebookEntry function
-phonebookEntries = 
-    [ PhonebookEntry {name = "PersonA", phone = Phone {phoneType = WorkMobile, countryCode = CountryCode 358, phoneNo = PhoneNo 123456789}}
-    , PhonebookEntry {name = "PersonB", phone = Phone {phoneType = PrivateMobile, countryCode = CountryCode 598, phoneNo = PhoneNo 112233445}}
-    , PhonebookEntry {name = "PersonC", phone = Phone {phoneType = Other, countryCode = CountryCode 996, phoneNo = PhoneNo 102030405}}
-    , PhonebookEntry {name = "PersonA", phone = Phone {phoneType = PrivateMobile, countryCode = CountryCode 358, phoneNo = PhoneNo 987654321}}
-    ]
-    
+-- Premade phonebook with entries
+phonebookEntries = addPhonebookEntry "PersonA" "WorkMobile" "358" "123456789"
+                 $ addPhonebookEntry "PersonB" "PrivateMobile" "598" "112233445"
+                 $ addPhonebookEntry "PersonC" "Other" "996" "102030405"
+                 $ addPhonebookEntry "PersonA" "PrivateMobile" "358" "987654321" Map.empty
+
 -------------------------------------------------------------------------------
 
 listOfSomeCountryCodes = ["1", "242", "236", "243", "420", "358", "996", "598", "666"]
@@ -55,27 +53,23 @@ instance Show Phone where
 -- Functions to create contry code and phone number data types
 toCountryCode :: Integer -> CountryCode
 toCountryCode cc
-    | cc >= 0 = CountryCode cc
-    | otherwise = error "Country code must be a positive integer."
+        | cc >= 0 = CountryCode cc
+        | otherwise = error "Invalid country code."
 
 toPhoneNo :: Integer -> PhoneNo
 toPhoneNo pn
-    | pn >= 0 = PhoneNo pn
-    | otherwise = error "Phone number must be a positive integer."
+        | pn >= 0 = PhoneNo pn
+        | otherwise = error "Invalid phone number."
 
--- Function to create a Phone
 toPhone :: PhoneType -> CountryCode -> PhoneNo -> Phone
-toPhone pt cc pn = Phone { phoneType=pt, countryCode=cc, phoneNo=pn }
+toPhone pt cc pn = Phone pt cc pn
+
 
 readPhone :: String -> String -> String -> Phone
-readPhone pt cc pn = 
-    Phone { phoneType = read pt
-          , countryCode = toCountryCode . read $ parseCountryCode cc
-          , phoneNo = toPhoneNo $ read pn
-          }
-    where parseCountryCode cc
-            | length cc < 1 = error "Invalid country code."
-            | head cc == '+' = (parseCountryCode $ tail cc)
-            | take 2 cc == "00" = (parseCountryCode $ drop 2 cc)
-            | cc `elem` listOfSomeCountryCodes = cc
-            | otherwise = error "Invalid country code."
+readPhone pt cc pn = toPhone (read pt)
+                             (toCountryCode $ parseCC cc)
+                             (toPhoneNo $ read pn)
+    where parseCC []           = -1
+          parseCC ('+':cc)     = parseCC cc
+          parseCC ('0':'0':cc) = parseCC cc
+          parseCC cc           = if cc `elem` listOfSomeCountryCodes then read cc else error "Unknown country code."
